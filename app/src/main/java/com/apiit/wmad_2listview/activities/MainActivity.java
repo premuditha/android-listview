@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
 
         dataModels = new ArrayList<>();
 
-        dataModels.add(new Product("Product A", 120.50, 10, "Description A", 0));
+        dataModels.add(new Product("Product A", 100.50, 10, "Description A", 0));
         dataModels.add(new Product("Product B", 130.50, 20, "Description B", 0));
         dataModels.add(new Product("Product C", 140.50, 30, "Description C", 0));
         dataModels.add(new Product("Product D", 150.50, 40, "Description D", 0));
