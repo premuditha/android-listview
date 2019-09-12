@@ -1,45 +1,70 @@
 package com.apiit.wmad_2listview.activities;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.apiit.wmad_2listview.R;
 import com.apiit.wmad_2listview.adapters.ProductAdapter;
 import com.apiit.wmad_2listview.models.Product;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 public class MainActivity extends AppCompatActivity {
 
-    ArrayList<Product> dataModels;
-    ListView listView;
+    private Gson mGson = new Gson();
+    private OkHttpClient mHttpClient = new OkHttpClient();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        listView = findViewById(R.id.list);
+        final ListView mListView = findViewById(R.id.list);
+        final Type productListTypeToken = new TypeToken<ArrayList<Product>>() {}.getType();
 
-        dataModels = new ArrayList<>();
+        Request request = new Request
+                .Builder()
+                 // replace this with your web api url.
+                .url("http://192.168.43.113:8084/WebApi/products")
+                .build();
 
-        dataModels.add(new Product("Product A", 100.50, 10, "Description A", 0));
-        dataModels.add(new Product("Product B", 130.50, 20, "Description B", 0));
-        dataModels.add(new Product("Product C", 140.50, 30, "Description C", 0));
-        dataModels.add(new Product("Product D", 150.50, 40, "Description D", 0));
-        dataModels.add(new Product("Product E", 160.50, 50, "Description E", 0));
-        dataModels.add(new Product("Product F", 170.50, 60, "Description F", 0));
-        dataModels.add(new Product("Product G", 180.50, 70, "Description G", 0));
-        dataModels.add(new Product("Product H", 190.50, 80, "Description H", 0));
-        dataModels.add(new Product("Product I", 220.50, 90, "Description I", 0));
-        dataModels.add(new Product("Product J", 320.50, 100, "Description J", 0));
-        dataModels.add(new Product("Product K", 420.50, 1100, "Description K", 0));
+        mHttpClient
+                .newCall(request)
+                .enqueue(new Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+                        e.printStackTrace();
+                    }
 
-        ProductAdapter adapter = new ProductAdapter(dataModels, getApplicationContext());
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        try (ResponseBody responseBody = response.body()) {
+                            if (!response.isSuccessful()) {
+                                ProductAdapter adapter = new ProductAdapter(new ArrayList<Product>(), getApplicationContext());
+                                mListView.setAdapter(adapter);
+                            }
 
-        listView.setAdapter(adapter);
+                            ArrayList<Product> productsToDisplay = mGson.fromJson(responseBody.string(), productListTypeToken);
+                            ProductAdapter adapter = new ProductAdapter(productsToDisplay, getApplicationContext());
+
+                            mListView.setAdapter(adapter);
+                        }
+                    }
+                });
+
+
     }
 }

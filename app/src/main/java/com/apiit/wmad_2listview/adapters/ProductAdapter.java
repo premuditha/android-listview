@@ -5,10 +5,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.apiit.wmad_2listview.R;
 import com.apiit.wmad_2listview.models.Product;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -21,6 +23,7 @@ public class ProductAdapter extends ArrayAdapter<Product> {
     private static class ViewHolder {
         TextView txtName;
         TextView txtPrice;
+        ImageView image;
     }
 
     public ProductAdapter(ArrayList<Product> data, Context context) {
@@ -44,9 +47,9 @@ public class ProductAdapter extends ArrayAdapter<Product> {
             viewHolder = new ViewHolder();
             LayoutInflater inflater = LayoutInflater.from(getContext());
             convertView = inflater.inflate(R.layout.product_item, parent, false);
-            viewHolder.txtName = (TextView) convertView.findViewById(R.id.name);
-            viewHolder.txtPrice = (TextView) convertView.findViewById(R.id.price);
-
+            viewHolder.txtName = convertView.findViewById(R.id.name);
+            viewHolder.txtPrice = convertView.findViewById(R.id.price);
+            viewHolder.image = convertView.findViewById(R.id.image);
             result = convertView;
 
             convertView.setTag(viewHolder);
@@ -54,6 +57,8 @@ public class ProductAdapter extends ArrayAdapter<Product> {
             viewHolder = (ViewHolder) convertView.getTag();
             result = convertView;
         }
+
+        Picasso.get().load(dataModel.getImageUrl()).into(viewHolder.image);
 
         viewHolder.txtName.setText(dataModel.getName());
         viewHolder.txtPrice.setText(dataModel.getPrice().toString());
